@@ -30,6 +30,7 @@ class ChessRecyclerAdapter(val context: Context, var data: List<Pair<Box, Pawn?>
             //set chessboard box pawn
             val box = data[position]
             val pawn = box.second
+            holder.pawn.setImageResource(android.R.color.transparent)
             pawn?.also {
                 holder.pawn.setImageDrawable(it.image())
             }
