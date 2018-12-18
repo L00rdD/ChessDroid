@@ -6,6 +6,7 @@ import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
 import ChessBoard
 import android.graphics.Color
+import android.view.View
 import com.esgi.davidlinhares.chess.R
 import com.esgi.davidlinhares.chess.game.Game
 import com.esgi.davidlinhares.chess.model.Box
@@ -13,22 +14,30 @@ import com.esgi.davidlinhares.chess.model.GameType
 import com.esgi.davidlinhares.chess.model.Pawn
 
 class ChessActivity : AppCompatActivity(), ChessActivityListener {
+    private var viewsHighlighted: MutableList<View> = mutableListOf()
+
     override fun onBoxSelectedRetrieved(boxes: List<Box>) {
         if (boxes.isEmpty()) return
+        viewsHighlighted.forEach { it.setBackgroundColor(getColor(R.color.brown_board)) }
         boxes.forEach { box ->
             val index = chessPresenter.getChessboardList().indexOfFirst { box == it.first }
             val view = chessRecyclerView.layoutManager?.findViewByPosition(index)
-            view?.also { it.setBackgroundColor(Color.GREEN) }
+            view?.also {
+                it.setBackgroundColor(Color.GREEN)
+                viewsHighlighted.add(it)
+            }
         }
     }
 
     override fun onPawnMovementSucees() {
+        viewsHighlighted.clear()
         val adapter = chessRecyclerView.adapter
         if (adapter is ChessRecyclerAdapter) adapter.data = chessPresenter.getChessboardList()
         adapter?.notifyDataSetChanged()
     }
 
     override fun onPawnMovementError() {
+        viewsHighlighted.clear()
         chessRecyclerView.adapter?.notifyDataSetChanged()
     }
 

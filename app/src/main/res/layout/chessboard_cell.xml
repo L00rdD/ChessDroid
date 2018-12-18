@@ -5,7 +5,7 @@
     android:layout_width="50sp"
     android:layout_height="50sp"
     android:padding="1sp"
-    android:background="#9E5F11">
+    android:background="@color/brown_board">
     <View
         android:id="@+id/box"
         android:layout_width="match_parent"
