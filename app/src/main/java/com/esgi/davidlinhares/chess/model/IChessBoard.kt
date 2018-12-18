@@ -1,3 +1,5 @@
+package com.esgi.davidlinhares.chess.model
+
 interface IChessBoard {
     val boxes: MutableMap<Box, Pawn?>
     var sidePlaying: ChessSide

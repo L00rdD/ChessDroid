@@ -1,3 +1,5 @@
+import com.esgi.davidlinhares.chess.model.Box
+import com.esgi.davidlinhares.chess.model.*
 import com.github.ajalt.mordant.TermColors
 
 class ChessBoard: IChessBoard {
@@ -178,6 +180,13 @@ class ChessBoard: IChessBoard {
 
     fun getPawn(box: Box): Pawn? {
         return boxes[box]
+    }
+
+    fun getCurrentMoveAvailable(box: Box): List<Box> {
+        getPawn(box)?.also {
+            if(it.side == sidePlaying) return getMovesAvailable(box)
+        }
+        return emptyList()
     }
 
     fun getMovesAvailable(box: Box): List<Box> {

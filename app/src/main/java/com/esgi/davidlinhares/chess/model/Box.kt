@@ -1,3 +1,5 @@
+package com.esgi.davidlinhares.chess.model
+
 enum class Box(val letter: Char, val number: Int) {
     A8('A', 8), B8('B', 8), C8('C', 8), D8('D', 8), E8('E', 8), F8('F', 8), G8('G', 8), H8('H', 8),
     A7('A', 7), B7('B', 7), C7('C', 7), D7('D', 7), E7('E', 7), F7('F', 7), G7('G', 7), H7('H', 7),

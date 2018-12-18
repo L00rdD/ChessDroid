@@ -1,9 +1,5 @@
 package com.esgi.davidlinhares.chess.view
 
-import Box
-import ChessSide
-import Pawn
-import PawnType
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.Drawable
@@ -14,9 +10,15 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import com.esgi.davidlinhares.chess.R
+import com.esgi.davidlinhares.chess.model.Box
+import com.esgi.davidlinhares.chess.model.ChessSide
+import com.esgi.davidlinhares.chess.model.Pawn
+import com.esgi.davidlinhares.chess.model.PawnType
 import kotlinx.android.synthetic.main.chessboard_cell.view.*
 
-class ChessboardRecyclerAdapter(val context: Context, val data: List<Pair<Box, Pawn?>>): RecyclerView.Adapter<ViewHolder>() {
+class ChessRecyclerAdapter(val context: Context, var data: List<Pair<Box, Pawn?>>): RecyclerView.Adapter<ViewHolder>() {
+    var listener: ChessActivityListener? = null
+
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         if (holder is ViewHolder) {
             //Set chessboard box colors
@@ -26,10 +28,12 @@ class ChessboardRecyclerAdapter(val context: Context, val data: List<Pair<Box, P
                 if (position % 2 == 0) holder.box.setBackgroundColor(Color.GRAY)
             }
             //set chessboard box pawn
-            val pawn = data[position].second
+            val box = data[position]
+            val pawn = box.second
             pawn?.also {
                 holder.pawn.setImageDrawable(it.image())
             }
+            holder.box.setOnClickListener { _ -> listener?.also { it.onBoxViewClicked(box.first, pawn)} }
         }
     }
 
