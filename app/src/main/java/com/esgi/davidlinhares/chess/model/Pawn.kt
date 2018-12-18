@@ -1,0 +1,1 @@
+data class Pawn(val type: PawnType, val side: ChessSide)

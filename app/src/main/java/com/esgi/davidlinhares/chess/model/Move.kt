@@ -1,0 +1,1 @@
+data class Move(val pawn: Pawn, val from: Box, val pawnTaken: Pawn?, val to: Box)
