@@ -448,10 +448,18 @@ class ChessBoard: IChessBoard {
         linearMax *= if (pawn.side == ChessSide.WHITE) 1 else -1
         val diag = if (pawn.side == ChessSide.WHITE) 1 else -1
         val positions = moves.filter {
-            (it.letter == pos.letter && getPawnMaxForSide(pawn.side, linearMax, pos.number, it.number) && getPawn(it) == null) ||
-                    (it.letter == pos.letter + 1 && it.number == pos.number + diag && getPawn(it)?.side == getOppositeSide(pawn.side)) ||
-                    (it.letter == pos.letter - 1 && it.number == pos.number + diag && getPawn(it)?.side == getOppositeSide(pawn.side))
+            (it.letter == pos.letter && getPawnMaxForSide(pawn.side, linearMax, pos.number, it.number) && getPawn(it) == null) || //Check linear
+                    (it.letter == pos.letter + 1 && it.number == pos.number + diag && getPawn(it)?.side == getOppositeSide(pawn.side)) || //Check diagonal
+                    (it.letter == pos.letter - 1 && it.number == pos.number + diag && getPawn(it)?.side == getOppositeSide(pawn.side)) //Check diagonal
         }.toMutableList()
+
+        if(positions.isNotEmpty()) {
+            val badPos = positions.firstOrNull { it.letter == pos.letter && (linearMax == -2 || linearMax == 2) && it.number == pos.number + linearMax }
+            badPos?.also {
+                val target = boxes.toList().first { box -> box.first.letter == pos.letter && box.first.number == it.number - diag }
+                if (getPawn(target.first) != null) positions.remove(badPos)
+            }
+        }
 
         if (doubleMovePawn != null && pos.number == passantNumber) {
             val doubleBox = getBox(doubleMovePawn!!) ?: return positions.toList()
