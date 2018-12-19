@@ -8,6 +8,7 @@ import android.support.v7.widget.RecyclerView.ViewHolder
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import android.widget.ImageView
 import com.esgi.davidlinhares.chess.R
 import com.esgi.davidlinhares.chess.model.Box
@@ -31,6 +32,7 @@ class ChessRecyclerAdapter(val context: Context, var data: List<Pair<Box, Pawn?>
             val box = data[position]
             val pawn = box.second
             holder.pawn.setImageResource(android.R.color.transparent)
+            holder.container.setBackgroundColor(context.getColor(R.color.brown_board))
             pawn?.also {
                 holder.pawn.setImageDrawable(it.image())
             }
@@ -53,6 +55,7 @@ class ChessRecyclerAdapter(val context: Context, var data: List<Pair<Box, Pawn?>
     class ViewHolder(view: View): RecyclerView.ViewHolder(view) {
         val box: View = view.box
         val pawn: ImageView = view.box_image
+        val container: View = view
     }
 
     private fun Pawn.image(): Drawable {

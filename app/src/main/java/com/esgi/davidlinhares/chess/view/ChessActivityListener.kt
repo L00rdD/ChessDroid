@@ -6,6 +6,7 @@ import com.esgi.davidlinhares.chess.model.Pawn
 interface ChessActivityListener {
     fun onBoxViewClicked(box: Box, pawn: Pawn?)
     fun onBoxSelectedRetrieved(boxes: List<Box>)
-    fun onPawnMovementSucees()
+    fun onPawnMovementSuccess()
     fun onPawnMovementError()
+    fun onUndoActionCompleted()
 }

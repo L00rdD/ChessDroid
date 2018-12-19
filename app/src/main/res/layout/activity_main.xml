@@ -16,4 +16,30 @@
         android:layout_height="wrap_content">
     </android.support.v7.widget.RecyclerView>
 
+
+    <TextView
+        android:id="@+id/chessKingStatusTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:textSize="50sp"
+        android:alpha="0"
+        android:textColor="@android:color/holo_red_light"
+        />
+
+    <Button
+        android:id="@+id/undo_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/chessRecyclerView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:text="@string/undo"
+        android:visibility="gone"
+        />
+
 </android.support.constraint.ConstraintLayout>

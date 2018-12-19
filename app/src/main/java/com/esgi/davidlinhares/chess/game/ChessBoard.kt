@@ -82,6 +82,7 @@ class ChessBoard: IChessBoard {
     private var lastmoveIsPassantCapture = false
     private var doubleMovePawn: Pawn? = null
     private var passantCapture: Box? = null
+    private var castlingState: RookType = RookType.NONE
 
     override fun getSideHistorical(side: ChessSide): List<Move> {
         return playsHistoric.filter { it.pawn.side == side }
@@ -94,9 +95,24 @@ class ChessBoard: IChessBoard {
         if (possibilities == null || possibilities.isEmpty() || !possibilities.contains(to)) return false
         checkPassantCapture(from, to)
         setDoubleMovePawn(from, to)
-        movePawn(from, to)
+        if (pawn.type == PawnType.KING && castlingState != RookType.NONE) {
+            if (sidePlaying == ChessSide.WHITE) {
+                val type = RookType.values().first { it != RookType.NONE && it != RookType.ALL && it.white!!.contains(to)}
+                castling(pawn.side, type)
+            } else {
+                val type = RookType.values().first { it != RookType.NONE && it != RookType.ALL && it.black!!.contains(to)}
+                castling(pawn.side, type)
+            }
+            castlingState = RookType.NONE
+        }
+        else {
+            lastmoveIsCastling = false
+            movePawn(from, to)
+            this.playsHistoric.add(Move(pawn, from, taken, to))
+        }
+
         switchSidePlaying()
-        this.playsHistoric.add(Move(pawn, from, taken, to))
+
         return true
     }
 
@@ -130,14 +146,14 @@ class ChessBoard: IChessBoard {
 
     override fun cancelLastMove() {
         if (lastmoveIsCastling) {
-            if(!undo()) return
+            undo()
             lastmoveIsCastling = false
         }
         if (lastmoveIsPassantCapture && passantCapture != null) {
             lastmoveIsPassantCapture = false
             boxes[Box.valueOf("${passantCapture!!.letter}${playsHistoric.last().from.number}")] = Pawn(PawnType.PAWN, sidePlaying)
         }
-        if (!undo()) return
+        undo()
         switchSidePlaying()
     }
 
@@ -193,6 +209,7 @@ class ChessBoard: IChessBoard {
         val pawn = getPawn(box) ?: return emptyList()
         val moves = getMovePossibilities(box)?.toMutableList() ?: return emptyList()
 
+        if(getKingStatus(pawn.side) == KingStatus.MAT) return emptyList()
         var previousBox = box
         var previousContent = getPawn(box)
         moves.removeIf {
@@ -256,37 +273,52 @@ class ChessBoard: IChessBoard {
         }
     }
 
-    fun castling(type: RookType) {
-        return castling(sidePlaying, type)
-    }
-
-    fun castling(side: ChessSide, type: RookType) {
-        val king = getPawn(Box.E1)
+    private fun castling(side: ChessSide, type: RookType): Boolean {
+        val king = if (side == ChessSide.WHITE) getPawn(Box.E1) else getPawn(Box.E8)
         val rook: Pawn
-        if (king == null) return
+        if (king == null) return false
         if (side == ChessSide.WHITE) {
             when(type) {
-                RookType.NONE -> return
+                RookType.NONE -> return false
                 RookType.SMALL -> {
-                    rook = getPawn(Box.H1) ?: return
+                    rook = getPawn(Box.H1) ?: return false
                     movePawn(Box.E1, Box.G1)
                     movePawn(Box.H1, Box.F1)
                     playsHistoric.add(Move(king, Box.E1, null, Box.G1))
                     playsHistoric.add(Move(king, Box.H1, null, Box.F1))
                 }
                 RookType.BIG -> {
-                    rook = getPawn(Box.A1) ?: return
+                    rook = getPawn(Box.A1) ?: return false
                     movePawn(Box.E1, Box.C1)
                     movePawn(Box.A1, Box.D1)
                     playsHistoric.add(Move(king, Box.E1, null, Box.C1))
                     playsHistoric.add(Move(king, Box.A1, null, Box.D1))
                 }
-                RookType.ALL -> return
+                RookType.ALL -> return false
+            }
+        } else {
+            when(type) {
+                RookType.NONE -> return false
+                RookType.SMALL -> {
+                    rook = getPawn(Box.H8) ?: return false
+                    movePawn(Box.E8, Box.G8)
+                    movePawn(Box.H8, Box.F8)
+                    playsHistoric.add(Move(king, Box.E8, null, Box.G8))
+                    playsHistoric.add(Move(king, Box.H8, null, Box.F8))
+                }
+                RookType.BIG -> {
+                    rook = getPawn(Box.A8) ?: return false
+                    movePawn(Box.E8, Box.C8)
+                    movePawn(Box.A8, Box.D8)
+                    playsHistoric.add(Move(king, Box.E8, null, Box.C8))
+                    playsHistoric.add(Move(king, Box.A8, null, Box.D8))
+                }
+                RookType.ALL -> return false
             }
         }
 
         lastmoveIsCastling = true
-        switchSidePlaying()
+        return lastmoveIsCastling
     }
 
     private fun getKing(side: ChessSide): Box? {
@@ -330,6 +362,9 @@ class ChessBoard: IChessBoard {
             val p = getPawn(it)
             (p != null && p.side == pawn.side)
         }
+
+        castlingState = getCastling(pawn.side)
+        if (castlingState != RookType.NONE) sides.addAll(if (pawn.side == ChessSide.WHITE) castlingState.white!! else castlingState.black!!)
 
         return sides.toList()
     }
