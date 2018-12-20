@@ -1,9 +1,10 @@
+package com.esgi.davidlinhares.chess.game
+
 import com.esgi.davidlinhares.chess.model.Box
 import com.esgi.davidlinhares.chess.model.*
 import com.github.ajalt.mordant.TermColors
 
 class ChessBoard: IChessBoard {
-
     override val boxes = mutableMapOf(
             //Black side
             Pair(Box.A8, Pawn(PawnType.ROOK, ChessSide.BLACK)),
@@ -189,7 +190,7 @@ class ChessBoard: IChessBoard {
     }
 
     override fun gradePawnPosition(pawn: Pawn) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
     }
 
     fun getKingStatus(): KingStatus = getKingStatus(sidePlaying)
@@ -325,7 +326,7 @@ class ChessBoard: IChessBoard {
         return boxes.toList().firstOrNull { it.second != null && it.second!!.side == ChessSide.WHITE && it.second!!.type == PawnType.KING }?.first
     }
 
-    private fun getOppositeSide(side: ChessSide): ChessSide {
+    fun getOppositeSide(side: ChessSide): ChessSide {
         return if (side == ChessSide.WHITE) ChessSide.BLACK else ChessSide.WHITE
     }
 
@@ -340,6 +341,23 @@ class ChessBoard: IChessBoard {
                 moves.forEach {
                     if (!possibilities.contains(it)) {
                         possibilities.add(it)
+                    }
+                }
+            }
+        }
+
+        return possibilities
+    }
+
+    private fun getAllMovePossibilities(pawns: List<Pawn>) : List<Box> {
+        val possibilities = mutableListOf<Box>()
+
+        pawns.forEach {
+            val moves = getMovePossibilities(getBox(it))
+            if (moves != null && moves.isNotEmpty()) {
+                moves.forEach {possibility ->
+                    if (!possibilities.contains(possibility)) {
+                        possibilities.add(possibility)
                     }
                 }
             }
@@ -496,13 +514,17 @@ class ChessBoard: IChessBoard {
             }
         }
 
-        if (doubleMovePawn != null && pos.number == passantNumber) {
-            val doubleBox = getBox(doubleMovePawn!!) ?: return positions.toList()
-            val posDiff = doubleBox.letter - pos.letter
-            if (posDiff == 1 || posDiff == -1) {
-                val passantBox = Box.valueOf("${pos.letter + posDiff}${pos.number + linearMax}")
-                this.passantCapture = passantBox
-                positions.add(passantBox)
+        if (pos.number == passantNumber) {
+            doubleMovePawn?.also {
+                val doubleBox = getBoxOrNull(it)
+                if (doubleBox != null) {
+                    val posDiff = doubleBox.letter - pos.letter
+                    if (posDiff == 1 || posDiff == -1) {
+                        val passantBox = Box.valueOf("${pos.letter + posDiff}${pos.number + linearMax}")
+                        this.passantCapture = passantBox
+                        positions.add(passantBox)
+                    }
+                }
             }
         }
 
@@ -567,11 +589,15 @@ class ChessBoard: IChessBoard {
         return true
     }
 
-    private fun getBox(pawn: Pawn): Box? {
-        return boxes.asIterable().firstOrNull { it.value === pawn }?.key
+    fun getBox(pawn: Pawn): Box {
+        return boxes.asIterable().first { it.value === pawn}.key
     }
 
-    private fun getMovePossibilities(box: Box): List<Box>? {
+    fun getBoxOrNull(pawn: Pawn): Box? {
+        return boxes.asIterable().firstOrNull { it.value === pawn}?.key
+    }
+
+    fun getMovePossibilities(box: Box): List<Box>? {
         val pawn = getPawn(box) ?: return null
         return when (pawn.type) {
             PawnType.PAWN -> getPawnMovePossibilities(pawn ,box)
@@ -586,10 +612,13 @@ class ChessBoard: IChessBoard {
     private fun checkPassantCapture(from: Box, to: Box) {
         val pawn = getPawn(from)
         val passant = passantCapture ?: return
-        if (pawn == null || pawn.type != PawnType.PAWN || to != passant || doubleMovePawn == null) return
-        val capture = getBox(doubleMovePawn!!) ?: return
-        boxes[capture] = null
-        lastmoveIsPassantCapture = true
+        if (pawn == null || pawn.type != PawnType.PAWN || to != passant) return
+        doubleMovePawn?.also {
+            val capture = getBoxOrNull(it) ?: return
+            boxes[capture] = null
+            lastmoveIsPassantCapture = true
+        }
+
     }
 
     private fun setDoubleMovePawn(from: Box, to: Box) {
@@ -600,15 +629,31 @@ class ChessBoard: IChessBoard {
         }
     }
 
-    private fun getPawnsWichCanMove(): List<Pawn?> = getPawnsWichCanMove(sidePlaying)
-    
-    private fun getPawnsWichCanMove(side: ChessSide): List<Pawn?> {
-        val sideBoxes = boxes.filter { it.value != null && it.value!!.side == side }
+    fun getPawnsWichCanMove(side: ChessSide): List<Pawn> {
+        val pawns = getAllPawnsForSide(side).toMutableList()
 
-        return sideBoxes.filter {
-            val possibilities = getMovePossibilities(it.key)
-            possibilities != null && possibilities.isNotEmpty()
-        }.values.toList()
+        pawns.removeIf {
+            val possibilities: List<Box>? = getMovePossibilities(getBox(it))
+            possibilities == null || possibilities.isEmpty()
+        }
+
+        return pawns
+    }
+
+    private fun getPawnsWichCanMove(pawns: List<Pawn>): List<Pawn> {
+        val list = pawns.toMutableList()
+        list.removeIf {
+            val possibilities = getMovePossibilities(getBox(it))
+            possibilities == null || possibilities.isEmpty()
+        }
+
+        return list.toList()
+    }
+
+    private fun getAllPawnsForSide(side: ChessSide): List<Pawn> {
+        val list: MutableList<Pawn> = mutableListOf()
+        boxes.forEach { it.value?.also { p -> if (p.side == side) list.add(p) } }
+        return list
     }
 
     private fun checkPawnDoubleMove(from: Box, to: Box): Boolean {
@@ -625,5 +670,36 @@ class ChessBoard: IChessBoard {
 
     fun getChessboard(): List<Pair<Box, Pawn?>> {
         return boxes.toList()
+    }
+
+    override fun gradeMove(from: Box, to: Box): Int {
+        var grade = 0
+        val middle = arrayOf(Box.D4, Box.D5, Box.E4, Box.E5)
+        val pawn = getPawn(from) ?: return grade
+        val pawns = getAllPawnsForSide(pawn.side)
+        val targetPawn = getPawn(to)
+        val pawnsPossibilities = getAllMovePossibilities(getPawnsWichCanMove(pawns))
+
+        if (from == to) return grade
+
+        movePawn(from, to) //set pawn to position
+
+        val oppositePawns = getAllPawnsForSide(getOppositeSide(pawn.side))
+
+        pawns.forEach { grade += it.type.points } // grade difference of number of pawns in board
+        oppositePawns.forEach { grade -= it.type.points }
+        middle.forEach { getPawn(it)?.also { p -> if (p.side == pawn.side) grade += 50 } } // grade middle control
+        middle.forEach {  if (pawnsPossibilities.contains(it)) grade += 50 }
+        val oppositeKing = getKingStatus(getOppositeSide(pawn.side))
+        when (oppositeKing) {
+            KingStatus.FREE -> {}
+            KingStatus.CHECKED -> grade += 200
+            KingStatus.MAT -> grade += 10000
+        }
+
+        movePawn(to, from)
+        boxes[to] = targetPawn
+
+        return grade
     }
 }

@@ -15,4 +15,5 @@ interface IChessBoard {
     fun printChessBoard()
     fun printHistorical()
     fun gradePawnPosition(pawn: Pawn)
+    fun gradeMove(from: Box, to: Box): Int
 }

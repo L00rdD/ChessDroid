@@ -1,29 +1,27 @@
 package com.esgi.davidlinhares.chess.view
 
-import android.support.v7.app.AppCompatActivity
+import android.graphics.Color
 import android.os.Bundle
+import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
-import ChessBoard
-import android.graphics.Color
-import android.opengl.Visibility
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import com.esgi.davidlinhares.chess.R
+import com.esgi.davidlinhares.chess.game.ChessBoard
 import com.esgi.davidlinhares.chess.game.Game
 import com.esgi.davidlinhares.chess.model.Box
 import com.esgi.davidlinhares.chess.model.GameType
 import com.esgi.davidlinhares.chess.model.Pawn
 import com.esgi.davidlinhares.chess.utils.Animator
-import kotlinx.android.synthetic.main.activity_main.*
 
 class ChessActivity : AppCompatActivity(), ChessActivityListener {
     private var viewsHighlighted: MutableList<View> = mutableListOf()
     private lateinit var chessRecyclerView: RecyclerView
     private lateinit var chessKingStatusTextView: TextView
     private lateinit var undoButton: Button
-    private var chessPresenter = ChessPresenter(Game(ChessBoard(), GameType.VERSUS)) //MUST BE MODIFIED ON IA IMPLEMENTATION
+    private var chessPresenter = ChessPresenter(Game(ChessBoard(), GameType.SINGLE_PLAYER)) //MUST BE MODIFIED ON IA IMPLEMENTATION
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

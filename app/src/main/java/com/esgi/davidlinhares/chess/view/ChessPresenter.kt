@@ -2,6 +2,7 @@ package com.esgi.davidlinhares.chess.view
 
 import com.esgi.davidlinhares.chess.game.Game
 import com.esgi.davidlinhares.chess.model.Box
+import com.esgi.davidlinhares.chess.model.GameType
 import com.esgi.davidlinhares.chess.model.KingStatus
 import com.esgi.davidlinhares.chess.model.Pawn
 
@@ -17,6 +18,10 @@ class ChessPresenter(override val game: Game) : IChessPresenter {
             if (game.playerMove(box)) {
                 listener?.also {
                     moves++
+                    if (game.gameType == GameType.SINGLE_PLAYER) {
+                        game.iaMove()
+                        moves++
+                    }
                     it.onPawnMovementSuccess()
                 }
             } else listener?.also { it.onPawnMovementError() }
