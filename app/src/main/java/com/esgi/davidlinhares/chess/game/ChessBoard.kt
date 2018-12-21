@@ -713,7 +713,7 @@ class ChessBoard: IChessBoard {
         clone.boxes.putAll(this.boxes)
         clone.sidePlaying = this.sidePlaying
         clone.playCount = this.playCount
-        clone.playsHistoric = this.playsHistoric
+        clone.playsHistoric = ArrayList(this.playsHistoric)
         clone.lastmoveIsCastling = this.lastmoveIsCastling
         clone.lastmoveIsPassantCapture = this.lastmoveIsPassantCapture
         clone.doubleMovePawn = this.doubleMovePawn
