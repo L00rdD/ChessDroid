@@ -18,7 +18,7 @@ class ChessPresenter(override val game: Game) : IChessPresenter {
             if (game.playerMove(box)) {
                 listener?.also {
                     moves++
-                    if (game.gameType == GameType.SINGLE_PLAYER) {
+                    if (game.gameType == GameType.SINGLE_PLAYER && !isKingMat()) {
                         game.iaMove()
                         moves++
                     }
