@@ -112,6 +112,12 @@ class ChessBoard: IChessBoard {
             this.playsHistoric.add(Move(pawn, from, taken, to))
         }
 
+        if (getKingStatus() != KingStatus.FREE) {
+            movePawn(to, from)
+            this.playsHistoric.removeAt(playsHistoric.lastIndex)
+            return false
+        }
+
         switchSidePlaying()
 
         return true

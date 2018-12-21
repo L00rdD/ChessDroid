@@ -6,7 +6,6 @@ class Game(private val chessBoard: ChessBoard, val gameType: GameType, val ai: C
     var castling = false
     var kingStatus: KingStatus = KingStatus.FREE
     private var pawnBox: Box? = null
-    private var pawnSelectedMoves: MutableList<Box>? = null
     private var pawnSelectedMovementsAvailable: MutableList<Box> = mutableListOf()
     private var castlingMoves: MutableMap<Box, RookType> = mutableMapOf()
 
@@ -23,7 +22,6 @@ class Game(private val chessBoard: ChessBoard, val gameType: GameType, val ai: C
         if (!pawnSelectedMovementsAvailable.isEmpty()) {
             pawnSelected = pawn
             pawnBox = box
-            pawnSelectedMoves = pawnSelectedMovementsAvailable
             if (pawn.type == PawnType.KING) {
                 if (chessBoard.getCastling() != RookType.NONE) castling = true
             }
@@ -36,10 +34,6 @@ class Game(private val chessBoard: ChessBoard, val gameType: GameType, val ai: C
         val fromBox = pawnBox ?: return false
         pawnBox = null
         castling = false
-        val authorizedMove = pawnSelectedMoves?.contains(box) ?: false
-        pawnSelectedMoves = null
-
-        if (!authorizedMove) return false
 
         val move = chessBoard.move(fromBox, box)
         if (move) kingStatus = chessBoard.getKingStatus()
