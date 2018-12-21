@@ -146,15 +146,16 @@ class ChessBoard: IChessBoard {
     }
 
     override fun cancelLastMove() {
-        if (lastmoveIsCastling) {
-            undo()
-            lastmoveIsCastling = false
-        }
+        if (playsHistoric.isEmpty()) return
+        val lastPawn = playsHistoric.last().pawn
+
         if (lastmoveIsPassantCapture && passantCapture != null) {
             lastmoveIsPassantCapture = false
             boxes[Box.valueOf("${passantCapture!!.letter}${playsHistoric.last().from.number}")] = Pawn(PawnType.PAWN, sidePlaying)
         }
+
         undo()
+        playsHistoric.lastOrNull()?.also { if (getPawn(it.to)!!.side == lastPawn.side) undo() } // if castling historical gets two entries
         switchSidePlaying()
     }
 

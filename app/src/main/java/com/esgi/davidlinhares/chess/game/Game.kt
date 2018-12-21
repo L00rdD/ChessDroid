@@ -53,5 +53,6 @@ class Game(private val chessBoard: ChessBoard, val gameType: GameType, val ai: C
 
     fun undo() {
         chessBoard.cancelLastMove()
+        if (gameType == GameType.SINGLE_PLAYER) chessBoard.cancelLastMove()
     }
 }
