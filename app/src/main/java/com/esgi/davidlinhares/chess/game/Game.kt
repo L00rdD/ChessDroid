@@ -1,7 +1,7 @@
 package com.esgi.davidlinhares.chess.game
 import com.esgi.davidlinhares.chess.model.*
 
-class Game(private val chessBoard: ChessBoard, val gameType: GameType, val ia: ChessIA = ChessIA(chessBoard, GameDifficulty.NORMAL, ChessSide.BLACK)) {
+class Game(private val chessBoard: ChessBoard, val gameType: GameType, val ai: ChessAI = ChessAI(chessBoard, GameDifficulty.NORMAL, ChessSide.BLACK)) {
     private var pawnSelected: Pawn? = null
     var castling = false
     var kingStatus: KingStatus = KingStatus.FREE
@@ -44,7 +44,7 @@ class Game(private val chessBoard: ChessBoard, val gameType: GameType, val ia: C
     fun iaMove(): Boolean {
         if (gameType == GameType.VERSUS) return false
 
-        val iaMove = ia.play()
+        val iaMove = ai.play()
         val move = chessBoard.move(iaMove.first, iaMove.second)
         if (move) kingStatus = chessBoard.getKingStatus()
 

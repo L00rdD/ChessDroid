@@ -2,7 +2,7 @@ package com.esgi.davidlinhares.chess.model
 
 import com.esgi.davidlinhares.chess.game.ChessBoard
 
-interface IChessIA {
+interface IChessAI {
     val chessboard: ChessBoard
     val difficulty: GameDifficulty
     val side: ChessSide

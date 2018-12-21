@@ -3,9 +3,9 @@ package com.esgi.davidlinhares.chess.game
 import com.esgi.davidlinhares.chess.model.Box
 import com.esgi.davidlinhares.chess.model.ChessSide
 import com.esgi.davidlinhares.chess.model.GameDifficulty
-import com.esgi.davidlinhares.chess.model.IChessIA
+import com.esgi.davidlinhares.chess.model.IChessAI
 
-class ChessIA(override val chessboard: ChessBoard, override val difficulty: GameDifficulty, override val side: ChessSide) : IChessIA {
+class ChessAI(override val chessboard: ChessBoard, override val difficulty: GameDifficulty, override val side: ChessSide) : IChessAI {
     private var playSequence: MutableList<Pair<PlayerMove, PlayerMove>> = mutableListOf()
 
     override fun play(): Pair<Box, Box> {
@@ -24,12 +24,16 @@ class ChessIA(override val chessboard: ChessBoard, override val difficulty: Game
     }
 
     private fun determineBestSequence(): List<Pair<PlayerMove, PlayerMove>> {
-        if (isPredictedMove()) {
-            playSequence.removeAt(0)
-            if (playSequence.count() > 0) return playSequence
-        }
+        val predicted = isPredictedMove() //Check prediction
+        if (playSequence.isNotEmpty()) playSequence.removeAt(0) // Remove move already done
+        if (predicted && playSequence.count() > 0) return playSequence
 
-        playSequence.add(Pair(PlayerMove(getBestMove(side)), PlayerMove(getBestMove(chessboard.getOppositeSide(side)))))
+        val bestMove = getBestMove(side)
+        val newChessBoard = chessboard.clone()
+        newChessBoard.move(bestMove.first, bestMove.second)
+        val bestOpponentMove = getBestMove(chessboard.getOppositeSide(side), newChessBoard)
+
+        playSequence.add(Pair(PlayerMove(bestMove.first, bestMove.second), PlayerMove(bestOpponentMove.first, bestOpponentMove.second)))
 
         return playSequence
     }
@@ -44,6 +48,10 @@ class ChessIA(override val chessboard: ChessBoard, override val difficulty: Game
     }
 
     private fun getBestMove(side: ChessSide): Pair<Box, Box> {
+        return getBestMove(side, this.chessboard)
+    }
+
+    private fun getBestMove(side: ChessSide, chessboard: ChessBoard): Pair<Box, Box> {
         val pawns = chessboard.getPawnsWichCanMove(side)
         val firstBox = chessboard.getBox(pawns.first()) // Used to initiate best move
         var bestMove = Pair(firstBox, firstBox)

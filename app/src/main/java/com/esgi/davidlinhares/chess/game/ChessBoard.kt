@@ -673,7 +673,7 @@ class ChessBoard: IChessBoard {
     }
 
     override fun gradeMove(from: Box, to: Box): Int {
-        var grade = 0
+        var grade = Int.MIN_VALUE
         val middle = arrayOf(Box.D4, Box.D5, Box.E4, Box.E5)
         val pawn = getPawn(from) ?: return grade
         val pawns = getAllPawnsForSide(pawn.side)
@@ -683,7 +683,11 @@ class ChessBoard: IChessBoard {
         if (from == to) return grade
 
         movePawn(from, to) //set pawn to position
-
+        if (getKingStatus(pawn.side) != KingStatus.FREE) {
+            movePawn(to, from)
+            boxes[to] = targetPawn
+            return grade
+        }
         val oppositePawns = getAllPawnsForSide(getOppositeSide(pawn.side))
 
         pawns.forEach { grade += it.type.points } // grade difference of number of pawns in board
@@ -701,5 +705,21 @@ class ChessBoard: IChessBoard {
         boxes[to] = targetPawn
 
         return grade
+    }
+
+    fun clone(): ChessBoard {
+        val clone = ChessBoard()
+        clone.boxes.clear()
+        clone.boxes.putAll(this.boxes)
+        clone.sidePlaying = this.sidePlaying
+        clone.playCount = this.playCount
+        clone.playsHistoric = this.playsHistoric
+        clone.lastmoveIsCastling = this.lastmoveIsCastling
+        clone.lastmoveIsPassantCapture = this.lastmoveIsPassantCapture
+        clone.doubleMovePawn = this.doubleMovePawn
+        clone.passantCapture = this.passantCapture
+        clone.castlingState = this.castlingState
+
+        return clone
     }
 }
