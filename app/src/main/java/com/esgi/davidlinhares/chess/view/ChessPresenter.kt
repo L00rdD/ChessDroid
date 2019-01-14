@@ -20,7 +20,6 @@ class ChessPresenter(override val game: Game) : IChessPresenter {
                     moves++
                     if (game.gameType == GameType.SINGLE_PLAYER && !isKingMat()) {
                         game.iaMove()
-                        moves++
                     }
                     it.onPawnMovementSuccess()
                 }

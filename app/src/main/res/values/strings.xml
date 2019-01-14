@@ -3,4 +3,5 @@
     <string name="king_checked">CHECKED</string>
     <string name="king_mat">MAT</string>
     <string name="undo">Annuler</string>
+    <string name="MODE">MODE</string>
 </resources>

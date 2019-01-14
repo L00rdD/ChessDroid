@@ -28,10 +28,10 @@ class ChessAI(override val chessboard: ChessBoard, override val difficulty: Game
         if (playSequence.isNotEmpty()) playSequence.removeAt(0) // Remove move already done
         if (predicted && playSequence.count() > 0) return playSequence
 
-        val bestMove = getBestMove(side)
+        val bestMove = getBestMove(side) ?: return emptyList()
         val newChessBoard = chessboard.clone()
         newChessBoard.move(bestMove.first, bestMove.second)
-        val bestOpponentMove = getBestMove(chessboard.getOppositeSide(side), newChessBoard)
+        val bestOpponentMove = getBestMove(chessboard.getOppositeSide(side), newChessBoard) ?: return emptyList()
 
         playSequence.add(Pair(PlayerMove(bestMove.first, bestMove.second), PlayerMove(bestOpponentMove.first, bestOpponentMove.second)))
 
@@ -47,12 +47,13 @@ class ChessAI(override val chessboard: ChessBoard, override val difficulty: Game
         return opponentMove.from == bestOpponentMove.from && opponentMove.to == bestOpponentMove.to
     }
 
-    private fun getBestMove(side: ChessSide): Pair<Box, Box> {
+    private fun getBestMove(side: ChessSide): Pair<Box, Box>? {
         return getBestMove(side, this.chessboard)
     }
 
-    private fun getBestMove(side: ChessSide, chessboard: ChessBoard): Pair<Box, Box> {
+    private fun getBestMove(side: ChessSide, chessboard: ChessBoard): Pair<Box, Box>? {
         val pawns = chessboard.getPawnsWichCanMove(side)
+        if (pawns.isEmpty()) return null
         val firstBox = chessboard.getBox(pawns.first()) // Used to initiate best move
         var bestMove = Pair(firstBox, firstBox)
         var grade = chessboard.gradeMove(firstBox, firstBox)

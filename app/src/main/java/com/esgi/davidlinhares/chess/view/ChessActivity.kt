@@ -1,6 +1,7 @@
 package com.esgi.davidlinhares.chess.view
 
 import android.graphics.Color
+import android.media.MediaCodec.MetricsConstants.MODE
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayoutManager
@@ -21,7 +22,7 @@ class ChessActivity : AppCompatActivity(), ChessActivityListener {
     private lateinit var chessRecyclerView: RecyclerView
     private lateinit var chessKingStatusTextView: TextView
     private lateinit var undoButton: Button
-    private var chessPresenter = ChessPresenter(Game(ChessBoard(), GameType.SINGLE_PLAYER)) //MUST BE MODIFIED ON IA IMPLEMENTATION
+    private lateinit var chessPresenter: ChessPresenter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,6 +31,12 @@ class ChessActivity : AppCompatActivity(), ChessActivityListener {
         chessRecyclerView = findViewById(R.id.chessRecyclerView)
         chessKingStatusTextView = findViewById(R.id.chessKingStatusTextView)
         undoButton = findViewById(R.id.undo_button)
+
+        val mode = intent.getStringExtra(getString(R.string.MODE))
+        chessPresenter = if (mode == GameType.SINGLE_PLAYER.name)
+            ChessPresenter(Game(ChessBoard(), GameType.SINGLE_PLAYER))
+        else
+            ChessPresenter(Game(ChessBoard(), GameType.VERSUS))
 
         undoButton.setOnClickListener { chessPresenter.undoButtonClicked() }
 

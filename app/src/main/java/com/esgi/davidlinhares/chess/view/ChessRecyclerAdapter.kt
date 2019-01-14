@@ -24,9 +24,9 @@ class ChessRecyclerAdapter(val context: Context, var data: List<Pair<Box, Pawn?>
         if (holder is ViewHolder) {
             //Set chessboard box colors
             if (position < 8 || position in 16..23 || position in 32..39 || position in  48..55 ) {
-                if (position % 2 == 1) holder.box.setBackgroundColor(Color.GRAY)
+                if (position % 2 == 1) holder.box.setBackgroundColor(context.getColor(R.color.brown_board))
             } else {
-                if (position % 2 == 0) holder.box.setBackgroundColor(Color.GRAY)
+                if (position % 2 == 0) holder.box.setBackgroundColor(context.getColor(R.color.brown_board))
             }
             //set chessboard box pawn
             val box = data[position]

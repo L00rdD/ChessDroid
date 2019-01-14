@@ -27,6 +27,15 @@ class Animator {
             animatorSet.start()
         }
 
+        fun rotateAnimation(): TranslateAnimation {
+            val rotateAnimation = TranslateAnimation(Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT, 1.1f, Animation.RELATIVE_TO_PARENT, 0.0f, Animation.RELATIVE_TO_PARENT,
+                0.0f)
+            rotateAnimation.duration = 1200
+            rotateAnimation.repeatCount = Animation.INFINITE
+
+            return rotateAnimation
+        }
+
         private fun fadeValueAnimatorOfFloat(from: Float, to: Float, interpolator: Interpolator, view: View, duration: Long): ValueAnimator {
             val valueAnimator = ValueAnimator.ofFloat(from, to)
 
