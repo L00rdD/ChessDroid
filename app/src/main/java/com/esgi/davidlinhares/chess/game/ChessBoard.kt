@@ -127,12 +127,19 @@ class ChessBoard: IChessBoard {
         val box = boxes.asIterable().first { it.value != null && it.value!!.side == side && it.value!!.type == PawnType.KING }
         val king = box.value
         val oppositeSide = getOppositeSide(side)
+        val oppositeMovePossibilities = getAllMovePossibilities(oppositeSide)
+        val movePossibilities = getAllMovePossibilities(side).toMutableList()
 
-        if (king == null ||!getAllMovePossibilities(oppositeSide).contains(box.key)) {
+        if (king == null ||!oppositeMovePossibilities.contains(box.key)) {
             return KingStatus.FREE
         }
 
         val possibilities = getKingMovePossibilities(king, box.key)?.toMutableList() ?: return KingStatus.MAT
+        var test = 0;
+
+        if (possibilities.count() == 1) {
+            movePossibilities.forEach { if (it == possibilities[0]) test++ }
+        }
 
         var previousBox = box.key
         var previousContent = king
@@ -142,13 +149,13 @@ class ChessBoard: IChessBoard {
             previousBox = it
             previousContent = getPawn(it)
             movePawn(box.key, it)
-            (getAllMovePossibilities(oppositeSide).contains(it))
+            (oppositeMovePossibilities.contains(it) && test < 2)
         }
 
         movePawn(previousBox, box.key)
         boxes[previousBox] = previousContent
 
-        return if(possibilities.isEmpty()) KingStatus.MAT else KingStatus.CHECKED
+        return if (possibilities.isEmpty()) KingStatus.MAT else KingStatus.CHECKED
     }
 
     override fun cancelLastMove() {
@@ -259,12 +266,12 @@ class ChessBoard: IChessBoard {
         when(rookType) {
             RookType.NONE -> return RookType.NONE
             RookType.SMALL -> {
-                if (getPawn(lineBox[3]) != null && getPawn(lineBox[4]) != null) return RookType.NONE
+                if (getPawn(lineBox[3]) != null || getPawn(lineBox[4]) != null) return RookType.NONE
                 return RookType.SMALL
             }
             RookType.BIG -> {
-                if (getPawn(lineBox[0]) != null && getPawn(lineBox[1]) != null
-                                && getPawn(lineBox[2]) != null) return RookType.NONE
+                if (getPawn(lineBox[0]) != null || getPawn(lineBox[1]) != null
+                                || getPawn(lineBox[2]) != null) return RookType.NONE
                 return RookType.BIG
             }
             RookType.ALL -> {
@@ -346,9 +353,7 @@ class ChessBoard: IChessBoard {
             val moves = getMovePossibilities(entry.key)
             if (moves != null && moves.isNotEmpty()) {
                 moves.forEach {
-                    if (!possibilities.contains(it)) {
-                        possibilities.add(it)
-                    }
+                    possibilities.add(it)
                 }
             }
         }
