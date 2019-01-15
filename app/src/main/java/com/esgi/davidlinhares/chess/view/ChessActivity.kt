@@ -22,7 +22,14 @@ class ChessActivity : AppCompatActivity(), ChessActivityListener {
     private lateinit var chessRecyclerView: RecyclerView
     private lateinit var chessKingStatusTextView: TextView
     private lateinit var undoButton: Button
+    private lateinit var replayButton: Button
+    private lateinit var menuButton: Button
     private lateinit var chessPresenter: ChessPresenter
+    private lateinit var movesCount: TextView
+
+    override fun onBackPressed() {
+        return
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,14 +38,19 @@ class ChessActivity : AppCompatActivity(), ChessActivityListener {
         chessRecyclerView = findViewById(R.id.chessRecyclerView)
         chessKingStatusTextView = findViewById(R.id.chessKingStatusTextView)
         undoButton = findViewById(R.id.undo_button)
+        movesCount = findViewById(R.id.moves_count_textview)
+        menuButton = findViewById(R.id.menu_button)
+        replayButton = findViewById(R.id.reset_button)
 
         val mode = intent.getStringExtra(getString(R.string.MODE))
         chessPresenter = if (mode == GameType.SINGLE_PLAYER.name)
-            ChessPresenter(Game(ChessBoard(), GameType.SINGLE_PLAYER))
+            ChessPresenter(Game(ChessBoard(), GameType.SINGLE_PLAYER), this)
         else
-            ChessPresenter(Game(ChessBoard(), GameType.VERSUS))
+            ChessPresenter(Game(ChessBoard(), GameType.VERSUS), this)
 
         undoButton.setOnClickListener { chessPresenter.undoButtonClicked() }
+        menuButton.setOnClickListener { chessPresenter.menuButtonClicked() }
+        replayButton.setOnClickListener { chessPresenter.replayButtonClicked() }
 
         chessPresenter.listener = this
 
@@ -71,6 +83,7 @@ class ChessActivity : AppCompatActivity(), ChessActivityListener {
         undoButton.visibility = View.VISIBLE
         val adapter = chessRecyclerView.adapter
         if (adapter is ChessRecyclerAdapter) adapter.data = chessPresenter.getChessboardList()
+        movesCount.text = chessPresenter.moves.toString()
         adapter?.notifyDataSetChanged()
         if (chessPresenter.isKingChecked()) {
             chessKingStatusTextView.text = getString(R.string.king_checked)
@@ -91,7 +104,12 @@ class ChessActivity : AppCompatActivity(), ChessActivityListener {
     override fun onUndoActionCompleted() {
         val adapter = chessRecyclerView.adapter
         if (adapter is ChessRecyclerAdapter) adapter.data = chessPresenter.getChessboardList()
+        movesCount.text = chessPresenter.moves.toString()
         adapter?.notifyDataSetChanged()
         if (chessPresenter.moves < 1) undoButton.visibility = View.GONE
+    }
+
+    override fun onGameReseted() {
+        onUndoActionCompleted()
     }
 }

@@ -9,4 +9,5 @@ interface ChessActivityListener {
     fun onPawnMovementSuccess()
     fun onPawnMovementError()
     fun onUndoActionCompleted()
+    fun onGameReseted()
 }

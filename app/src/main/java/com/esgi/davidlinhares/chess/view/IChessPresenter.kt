@@ -5,11 +5,13 @@ import com.esgi.davidlinhares.chess.model.KingStatus
 import com.esgi.davidlinhares.chess.model.Pawn
 
 interface IChessPresenter {
-    val game: Game
+    var game: Game
     fun boxSelectedAction(box: Box, pawn: Pawn?)
     fun getChessboardList(): List<Pair<Box, Pawn?>>
     fun isKingChecked(): Boolean
     fun isKingMat(): Boolean
     fun undoButtonClicked()
+    fun menuButtonClicked()
+    fun replayButtonClicked()
 }
 

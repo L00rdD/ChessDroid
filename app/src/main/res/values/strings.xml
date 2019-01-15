@@ -4,4 +4,7 @@
     <string name="king_mat">MAT</string>
     <string name="undo">Annuler</string>
     <string name="MODE">MODE</string>
+    <string name="menu">Menu</string>
+    <string name="movements">Déplacements:</string>
+    <string name="replay">Rejouer</string>
 </resources>

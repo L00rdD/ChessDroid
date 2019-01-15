@@ -1,12 +1,13 @@
 package com.esgi.davidlinhares.chess.view
 
+import com.esgi.davidlinhares.chess.game.ChessBoard
 import com.esgi.davidlinhares.chess.game.Game
 import com.esgi.davidlinhares.chess.model.Box
 import com.esgi.davidlinhares.chess.model.GameType
 import com.esgi.davidlinhares.chess.model.KingStatus
 import com.esgi.davidlinhares.chess.model.Pawn
 
-class ChessPresenter(override val game: Game) : IChessPresenter {
+class ChessPresenter(override var game: Game, val context: ChessActivity) : IChessPresenter {
     var listener: ChessActivityListener? = null
     var moves: Int = 0
 
@@ -43,5 +44,17 @@ class ChessPresenter(override val game: Game) : IChessPresenter {
 
     override fun isKingMat(): Boolean {
         return game.kingStatus == KingStatus.MAT
+    }
+
+    override fun menuButtonClicked() {
+        this.context.finish()
+    }
+
+    override fun replayButtonClicked() {
+        this.listener?.also {
+            this.game = Game(ChessBoard(), game.gameType, game.ai)
+            moves = 0
+            it.onGameReseted()
+        }
     }
 }
