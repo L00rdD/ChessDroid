@@ -135,10 +135,10 @@ class ChessBoard: IChessBoard {
         }
 
         val possibilities = getKingMovePossibilities(king, box.key)?.toMutableList() ?: return KingStatus.MAT
-        var test = 0;
+        var possibilitiesCount = 0;
 
         if (possibilities.count() == 1) {
-            movePossibilities.forEach { if (it == possibilities[0]) test++ }
+            movePossibilities.forEach { if (it == possibilities[0]) possibilitiesCount++ }
         }
 
         var previousBox = box.key
@@ -149,7 +149,7 @@ class ChessBoard: IChessBoard {
             previousBox = it
             previousContent = getPawn(it)
             movePawn(box.key, it)
-            (oppositeMovePossibilities.contains(it) && test < 2)
+            (oppositeMovePossibilities.contains(it) && possibilitiesCount < 2)
         }
 
         movePawn(previousBox, box.key)
